@@ -22,6 +22,7 @@ namespace Tamagotchi.Controllers
     public List<Pet> GetAllPets()
     {
       var pets = db.Pets.OrderBy(n => n.Name);
+
       return pets.ToList();
     }
 
@@ -29,6 +30,7 @@ namespace Tamagotchi.Controllers
     public Pet GetOnePet(int id)
     {
       var pet = db.Pets.FirstOrDefault(i => i.Id == id);
+      InteractionUpdate(pet);
       return pet;
     }
 
@@ -36,7 +38,7 @@ namespace Tamagotchi.Controllers
     public List<Pet> ViewAlive()
     {
       var alive = db.Pets.Where(i => i.IsDead == false);
-      var ordered = alive.OrderBy(n => n.Name);
+      var ordered = alive.OrderBy(n => n.Id);
       return ordered.ToList();
     }
 
@@ -52,20 +54,18 @@ namespace Tamagotchi.Controllers
     public Pet PlayWithPet(int id)
     {
       var petToChange = db.Pets.FirstOrDefault(i => i.Id == id);
-      petToChange.LastInteractedWithDate = DateTime.Now;
       var killed = RandomKilling();
       if (killed == true)
       {
         petToChange.IsDead = true;
         petToChange.DeathDate = DateTime.Now;
-        db.SaveChanges();
       }
       else if (killed == false)
       {
         petToChange.HappinessLevel = petToChange.HappinessLevel + 5;
         petToChange.HungerLevel = petToChange.HungerLevel + 3;
-        db.SaveChanges();
       }
+      InteractionUpdate(petToChange);
       return petToChange;
     }
 
@@ -73,20 +73,18 @@ namespace Tamagotchi.Controllers
     public Pet FeedPet(int id)
     {
       var petToFeed = db.Pets.FirstOrDefault(i => i.Id == id);
-      petToFeed.LastInteractedWithDate = DateTime.Now;
       var killed = RandomKilling();
       if (killed == true)
       {
         petToFeed.IsDead = true;
         petToFeed.DeathDate = DateTime.Now;
-        db.SaveChanges();
       }
       else if (killed == false)
       {
         petToFeed.HappinessLevel = petToFeed.HappinessLevel + 3;
         petToFeed.HungerLevel = petToFeed.HungerLevel - 5;
-        db.SaveChanges();
       }
+      InteractionUpdate(petToFeed);
       return petToFeed;
     }
 
@@ -94,19 +92,17 @@ namespace Tamagotchi.Controllers
     public Pet ScoldPet(int id)
     {
       var petToScold = db.Pets.FirstOrDefault(i => i.Id == id);
-      petToScold.LastInteractedWithDate = DateTime.Now;
       var killed = RandomKilling();
       if (killed == true)
       {
         petToScold.IsDead = true;
         petToScold.DeathDate = DateTime.Now;
-        db.SaveChanges();
       }
       else if (killed == false)
       {
         petToScold.HappinessLevel = petToScold.HappinessLevel - 5;
-        db.SaveChanges();
       }
+      InteractionUpdate(petToScold);
       return petToScold;
     }
 
@@ -135,6 +131,13 @@ namespace Tamagotchi.Controllers
       return killed;
 
     }
-
+    public void InteractionUpdate(Pet pet)
+    {
+      pet.LastInteractedWithDate = DateTime.Now;
+      db.SaveChanges();
+    }
+    public void KillPet()
+    {
+    }
   }
 }
