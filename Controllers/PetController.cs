@@ -50,7 +50,7 @@ namespace Tamagotchi.Controllers
     public Pet CreateNewTamagotchi(Pet pet)
     {
       db.Pets.Add(pet);
-      db.SaveChanges();
+      InteractionUpdate(pet);
       return pet;
     }
 
@@ -177,6 +177,8 @@ namespace Tamagotchi.Controllers
           if (p.LastInteractedWithDate < DateTime.Now.AddDays(-3))
           {
             p.IsDead = true;
+            p.DeathDate = DateTime.Now;
+
           }
           else if (p.LastInteractedWithDate > DateTime.Now.AddDays(-3))
           {
@@ -194,6 +196,7 @@ namespace Tamagotchi.Controllers
         if (pet.LastInteractedWithDate < DateTime.Now.AddDays(-3))
         {
           pet.IsDead = true;
+          pet.DeathDate = DateTime.Now;
         }
         else if (pet.LastInteractedWithDate > DateTime.Now.AddDays(-3))
         {
