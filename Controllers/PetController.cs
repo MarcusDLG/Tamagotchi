@@ -113,6 +113,7 @@ namespace Tamagotchi.Controllers
     public ActionResult<Pet> ScoldPet(int id)
     {
       var petToScold = db.Pets.FirstOrDefault(i => i.Id == id);
+      KillPet(petToScold);
       if (petToScold.IsDead == true)
       {
         return NotFound();
