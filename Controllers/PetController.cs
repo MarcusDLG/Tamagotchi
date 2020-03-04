@@ -32,6 +32,7 @@ namespace Tamagotchi.Controllers
     public Pet GetOnePet(int id)
     {
       var pet = db.Pets.FirstOrDefault(i => i.Id == id);
+      KillPet(pet);
       InteractionUpdate(pet);
       return pet;
     }
@@ -40,6 +41,7 @@ namespace Tamagotchi.Controllers
     public List<Pet> ViewAlive()
     {
       var alive = db.Pets.Where(i => i.IsDead == false);
+      KillPets(alive.ToList());
       var ordered = alive.OrderBy(n => n.Id);
       return ordered.ToList();
     }
@@ -56,6 +58,7 @@ namespace Tamagotchi.Controllers
     public ActionResult<Pet> PlayWithPet(int id)
     {
       var petToChange = db.Pets.FirstOrDefault(i => i.Id == id);
+      KillPet(petToChange);
       var killed = RandomKilling();
       if (petToChange.IsDead == true)
       {
@@ -83,6 +86,7 @@ namespace Tamagotchi.Controllers
     public ActionResult<Pet> FeedPet(int id)
     {
       var petToFeed = db.Pets.FirstOrDefault(i => i.Id == id);
+      KillPet(petToFeed);
       if (petToFeed.IsDead == true)
       {
         return NotFound();
@@ -178,7 +182,25 @@ namespace Tamagotchi.Controllers
             p.IsDead = false;
           }
         }
+        db.SaveChanges();
       }
+    }
+    public void KillPet(Pet pet)
+    {
+      if (pet.IsDead == false)
+      {
+
+        if (pet.LastInteractedWithDate < DateTime.Now.AddDays(-3))
+        {
+          pet.IsDead = true;
+        }
+        else if (pet.LastInteractedWithDate > DateTime.Now.AddDays(-3))
+        {
+          pet.IsDead = false;
+        }
+
+      }
+      db.SaveChanges();
     }
   }
 }
